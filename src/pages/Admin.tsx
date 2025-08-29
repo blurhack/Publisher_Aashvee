@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { useRouter } from "next/router" // add Next router for client-side redirect
 
 import Header from "@/components/Header"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -23,12 +24,12 @@ import { Plus, Trash2, Upload, Save, Settings, ImageIcon } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/contexts/AuthContext"
-import { Navigate } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
 
 const Admin = () => {
   const { user, isAdmin, loading } = useAuth()
   const { toast } = useToast()
+  const router = useRouter() // add Next router for client-side redirect
   const [selectedTab, setSelectedTab] = useState("overview")
   const [uploadingImage, setUploadingImage] = useState(false)
   const [manuscripts, setManuscripts] = useState([])
@@ -126,6 +127,12 @@ const Admin = () => {
     fetchUpcomingBooks()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, isAdmin])
+
+  useEffect(() => {
+    if (!loading && (!user || !isAdmin)) {
+      router.replace("/auth")
+    }
+  }, [loading, user, isAdmin, router])
 
   const handleAddBook = () => {
     const book = {
@@ -293,7 +300,11 @@ const Admin = () => {
   }
 
   if (!user || !isAdmin) {
-    return <Navigate to="/auth" replace />
+    return (
+      <div className="min-h-screen flex items-center justify-center text-sm text-muted-foreground">
+        Redirecting to sign in...
+      </div>
+    )
   }
 
   return (
@@ -976,3 +987,7 @@ const Admin = () => {
 }
 
 export default Admin
+
+export async function getServerSideProps() {
+  return { props: {} }
+}
