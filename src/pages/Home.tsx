@@ -1,34 +1,34 @@
-import Header from "@/components/Header";
-import Hero from "@/components/Hero";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { BookOpen, Users, Award, Zap, Globe, CheckCircle, Star, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import Header from "@/components/Header"
+import Hero from "@/components/Hero"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { BookOpen, Award, Zap, Globe, CheckCircle, Star, ArrowRight } from "lucide-react"
+import Link from "next/link"
 
 const Home = () => {
   const features = [
     {
       icon: BookOpen,
       title: "Expert Publishing",
-      description: "Professional editing, design, and distribution services for academic and technical publications."
+      description: "Professional editing, design, and distribution services for academic and technical publications.",
     },
     {
       icon: Globe,
       title: "Global Reach",
-      description: "Your books reach readers worldwide through our extensive distribution network."
+      description: "Your books reach readers worldwide through our extensive distribution network.",
     },
     {
       icon: Award,
       title: "Quality Assurance",
-      description: "Rigorous peer review and editorial standards ensure the highest quality publications."
+      description: "Rigorous peer review and editorial standards ensure the highest quality publications.",
     },
     {
       icon: Zap,
       title: "Fast Track Publishing",
-      description: "Streamlined publishing process gets your book to market faster than traditional publishers."
-    }
-  ];
+      description: "Streamlined publishing process gets your book to market faster than traditional publishers.",
+    },
+  ]
 
   const packages = [
     {
@@ -40,9 +40,9 @@ const Home = () => {
         "Basic cover design",
         "ISBN assignment",
         "Print-on-demand",
-        "Online distribution"
+        "Online distribution",
       ],
-      popular: false
+      popular: false,
     },
     {
       name: "Professional",
@@ -54,9 +54,9 @@ const Home = () => {
         "Marketing support",
         "Multiple format publishing",
         "Author website",
-        "Review coordination"
+        "Review coordination",
       ],
-      popular: true
+      popular: true,
     },
     {
       name: "Premium",
@@ -68,11 +68,11 @@ const Home = () => {
         "Video book trailer",
         "PR & media outreach",
         "International distribution",
-        "Dedicated account manager"
+        "Dedicated account manager",
       ],
-      popular: false
-    }
-  ];
+      popular: false,
+    },
+  ]
 
   const featuredBooks = [
     {
@@ -81,7 +81,7 @@ const Home = () => {
       authors: ["Dr. Yalla Venkate", "Arunkumar Beyyala", "V Saipriya"],
       image: "/lovable-uploads/3815e5af-90e4-4ec8-91f0-ae967ba64457.png",
       category: "Technology",
-      rating: 4.8
+      rating: 4.8,
     },
     {
       id: 2,
@@ -89,14 +89,14 @@ const Home = () => {
       authors: ["Surendranath Kalagara", "P Hemanth Raj Vardhan"],
       image: "/lovable-uploads/0fcb646b-06d4-45cf-8829-38531cd653de.png",
       category: "AI & ML",
-      rating: 4.9
-    }
-  ];
+      rating: 4.9,
+    },
+  ]
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       {/* Hero Section */}
       <Hero />
 
@@ -104,9 +104,7 @@ const Home = () => {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Why Choose AASHVEE Publishers?
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Why Choose AASHVEE Publishers?</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               We combine traditional publishing excellence with modern technology to deliver exceptional results.
             </p>
@@ -138,7 +136,7 @@ const Home = () => {
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Featured Publications</h2>
               <p className="text-xl text-muted-foreground">Discover our latest academic and technical publications</p>
             </div>
-            <Link to="/books">
+            <Link href="/books">
               <Button variant="outline">
                 View All Books
                 <ArrowRight className="ml-2 w-4 h-4" />
@@ -151,8 +149,8 @@ const Home = () => {
               <Card key={book.id} className="overflow-hidden hover:shadow-xl transition-shadow duration-300">
                 <div className="flex">
                   <div className="w-1/3">
-                    <img 
-                      src={book.image} 
+                    <img
+                      src={book.image || "/placeholder.svg"}
                       alt={book.title}
                       className="w-full h-full object-cover"
                     />
@@ -166,9 +164,7 @@ const Home = () => {
                       </div>
                     </div>
                     <CardTitle className="text-lg mb-3 leading-tight">{book.title}</CardTitle>
-                    <div className="text-sm text-muted-foreground mb-4">
-                      By {book.authors.join(", ")}
-                    </div>
+                    <div className="text-sm text-muted-foreground mb-4">By {book.authors.join(", ")}</div>
                     <Button size="sm" className="w-full">
                       Learn More
                     </Button>
@@ -184,9 +180,7 @@ const Home = () => {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Publishing Packages
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Publishing Packages</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Choose the perfect package for your publishing journey. All packages include our commitment to quality.
             </p>
@@ -194,7 +188,7 @@ const Home = () => {
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {packages.map((pkg, index) => (
-              <Card key={index} className={`relative ${pkg.popular ? 'border-brand-primary shadow-lg scale-105' : ''}`}>
+              <Card key={index} className={`relative ${pkg.popular ? "border-brand-primary shadow-lg scale-105" : ""}`}>
                 {pkg.popular && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                     <Badge className="bg-brand-primary text-white">Most Popular</Badge>
@@ -214,10 +208,10 @@ const Home = () => {
                       </li>
                     ))}
                   </ul>
-                  <Link to="/packages">
-                    <Button 
-                      className={`w-full mt-6 ${pkg.popular ? 'bg-brand-primary hover:bg-brand-secondary' : ''}`}
-                      variant={pkg.popular ? 'default' : 'outline'}
+                  <Link href="/packages">
+                    <Button
+                      className={`w-full mt-6 ${pkg.popular ? "bg-brand-primary hover:bg-brand-secondary" : ""}`}
+                      variant={pkg.popular ? "default" : "outline"}
                     >
                       Get Started
                     </Button>
@@ -232,21 +226,23 @@ const Home = () => {
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-brand-primary to-brand-secondary text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Ready to Share Your Knowledge?
-          </h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Share Your Knowledge?</h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
             Join hundreds of authors who have trusted AASHVEE Publishers to bring their ideas to life.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/contact">
+            <Link href="/contact">
               <Button size="lg" variant="secondary">
                 Start Your Journey
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
-            <Link to="/packages">
-              <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-brand-primary">
+            <Link href="/packages">
+              <Button
+                size="lg"
+                variant="outline"
+                className="text-white border-white hover:bg-white hover:text-brand-primary bg-transparent"
+              >
                 View Packages
               </Button>
             </Link>
@@ -260,9 +256,9 @@ const Home = () => {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
-                <img 
-                  src="/lovable-uploads/002c1556-cc44-4069-aae1-86335d66c709.png" 
-                  alt="AASHVEE Publishers Logo" 
+                <img
+                  src="/lovable-uploads/002c1556-cc44-4069-aae1-86335d66c709.png"
+                  alt="AASHVEE Publishers Logo"
                   className="h-12 w-auto"
                 />
               </div>
@@ -271,9 +267,21 @@ const Home = () => {
             <div>
               <h4 className="font-semibold mb-3">Quick Links</h4>
               <ul className="space-y-2 text-sm opacity-75">
-                <li><Link to="/books" className="hover:opacity-100">Books</Link></li>
-                <li><Link to="/authors" className="hover:opacity-100">Authors</Link></li>
-                <li><Link to="/packages" className="hover:opacity-100">Packages</Link></li>
+                <li>
+                  <Link href="/books" className="hover:opacity-100">
+                    Books
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/authors" className="hover:opacity-100">
+                    Authors
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/packages" className="hover:opacity-100">
+                    Packages
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
@@ -298,7 +306,7 @@ const Home = () => {
         </div>
       </footer>
     </div>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home
