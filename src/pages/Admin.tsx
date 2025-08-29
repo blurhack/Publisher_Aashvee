@@ -1,86 +1,40 @@
-import Header from "@/components/Header";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  BookOpen, 
-  Users, 
-  Package, 
-  TrendingUp, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Eye,
-  Upload,
-  Save,
-  Settings,
-  Image
-} from "lucide-react";
-import { useState, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
-import { Navigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+"use client"
+
+import type React from "react"
+
+import Header from "@/components/Header"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Plus, Trash2, Upload, Save, Settings, ImageIcon } from "lucide-react"
+import { useState, useEffect } from "react"
+import { useToast } from "@/hooks/use-toast"
+import { useAuth } from "@/contexts/AuthContext"
+import { Navigate } from "react-router-dom"
+import { supabase } from "@/integrations/supabase/client"
 
 const Admin = () => {
-  const { user, isAdmin, loading } = useAuth();
-  const { toast } = useToast();
-  const [selectedTab, setSelectedTab] = useState("overview");
-  const [uploadingImage, setUploadingImage] = useState(false);
-  const [manuscripts, setManuscripts] = useState([]);
-  const [checkingPlagiarism, setCheckingPlagiarism] = useState(false);
-  const [upcomingBooks, setUpcomingBooks] = useState<any[]>([]);
+  const { user, isAdmin, loading } = useAuth()
+  const { toast } = useToast()
+  const [selectedTab, setSelectedTab] = useState("overview")
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const [manuscripts, setManuscripts] = useState([])
+  const [checkingPlagiarism, setCheckingPlagiarism] = useState(false)
+  const [upcomingBooks, setUpcomingBooks] = useState<any[]>([])
 
-  // Show loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-brand-primary"></div>
-      </div>
-    );
-  }
-  
-  // Redirect if not authenticated or not admin
-  if (!user || !isAdmin) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  // Fetch manuscripts on component mount
-  useEffect(() => {
-    fetchManuscripts();
-    fetchUpcomingBooks();
-  }, []);
-
-  const fetchUpcomingBooks = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('upcoming_books')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      setUpcomingBooks(data || []);
-    } catch (error) {
-      console.error('Error fetching upcoming books:', error);
-    }
-  };
-
-  const fetchManuscripts = async () => {
-    try {
-      // For now using mock data since the Supabase client might not have proper types
-      setManuscripts([]);
-    } catch (error) {
-      console.error('Error fetching manuscripts:', error);
-    }
-  };
-
-  // Sample data - in real app this would come from a backend
   const [books, setBooks] = useState([
     {
       id: 1,
@@ -90,7 +44,7 @@ const Admin = () => {
       status: "Published",
       sales: 450,
       revenue: "₹2,92,500",
-      publishDate: "2024-01-15"
+      publishDate: "2024-01-15",
     },
     {
       id: 2,
@@ -100,9 +54,9 @@ const Admin = () => {
       status: "Published",
       sales: 320,
       revenue: "₹3,04,000",
-      publishDate: "2024-03-20"
-    }
-  ]);
+      publishDate: "2024-03-20",
+    },
+  ])
 
   const [authors, setAuthors] = useState([
     {
@@ -111,7 +65,7 @@ const Admin = () => {
       email: "yalla.venkat@example.com",
       booksPublished: 5,
       totalSales: 1250,
-      status: "Active"
+      status: "Active",
     },
     {
       id: 2,
@@ -119,7 +73,7 @@ const Admin = () => {
       email: "arun.beyyala@example.com",
       booksPublished: 3,
       totalSales: 890,
-      status: "Active"
+      status: "Active",
     },
     {
       id: 3,
@@ -127,7 +81,7 @@ const Admin = () => {
       email: "sarah.johnson@example.com",
       booksPublished: 2,
       totalSales: 650,
-      status: "Active"
+      status: "Active",
     },
     {
       id: 4,
@@ -135,9 +89,9 @@ const Admin = () => {
       email: "michael.chen@example.com",
       booksPublished: 4,
       totalSales: 980,
-      status: "Active"
-    }
-  ]);
+      status: "Active",
+    },
+  ])
 
   const [newBook, setNewBook] = useState({
     title: "",
@@ -147,8 +101,8 @@ const Admin = () => {
     price: "",
     isbn: "",
     status: "Draft",
-    coverImage: ""
-  });
+    coverImage: "",
+  })
 
   const [newAuthor, setNewAuthor] = useState({
     name: "",
@@ -156,26 +110,33 @@ const Admin = () => {
     bio: "",
     specialization: "",
     affiliation: "",
-    profileImage: ""
-  });
+    profileImage: "",
+  })
 
   const stats = {
     totalBooks: books.length,
     totalAuthors: authors.length,
     totalSales: books.reduce((sum, book) => sum + book.sales, 0),
-    totalRevenue: books.reduce((sum, book) => sum + parseInt(book.revenue.replace(/[₹,]/g, '')), 0)
-  };
+    totalRevenue: books.reduce((sum, book) => sum + Number.parseInt(book.revenue.replace(/[₹,]/g, "")), 0),
+  }
+
+  useEffect(() => {
+    if (!user || !isAdmin) return
+    fetchManuscripts()
+    fetchUpcomingBooks()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, isAdmin])
 
   const handleAddBook = () => {
     const book = {
       id: books.length + 1,
       ...newBook,
-      authors: newBook.authors.split(',').map(a => a.trim()),
+      authors: newBook.authors.split(",").map((a) => a.trim()),
       sales: 0,
       revenue: "₹0",
-      publishDate: new Date().toISOString().split('T')[0]
-    };
-    setBooks([...books, book]);
+      publishDate: new Date().toISOString().split("T")[0],
+    }
+    setBooks([...books, book])
     setNewBook({
       title: "",
       authors: "",
@@ -184,13 +145,13 @@ const Admin = () => {
       price: "",
       isbn: "",
       status: "Draft",
-      coverImage: ""
-    });
+      coverImage: "",
+    })
     toast({
       title: "Book Added Successfully",
       description: "The new book has been added to the catalog.",
-    });
-  };
+    })
+  }
 
   const handleAddAuthor = () => {
     const author = {
@@ -198,114 +159,147 @@ const Admin = () => {
       ...newAuthor,
       booksPublished: 0,
       totalSales: 0,
-      status: "Active"
-    };
-    setAuthors([...authors, author]);
+      status: "Active",
+    }
+    setAuthors([...authors, author])
     setNewAuthor({
       name: "",
       email: "",
       bio: "",
       specialization: "",
       affiliation: "",
-      profileImage: ""
-    });
+      profileImage: "",
+    })
     toast({
       title: "Author Added Successfully",
       description: "The new author has been added to the system.",
-    });
-  };
+    })
+  }
 
   const handleDeleteBook = (id: number) => {
-    setBooks(books.filter(book => book.id !== id));
+    setBooks(books.filter((book) => book.id !== id))
     toast({
       title: "Book Deleted",
       description: "The book has been removed from the catalog.",
-    });
-  };
+    })
+  }
 
   const handleDeleteAuthor = (id: number) => {
-    setAuthors(authors.filter(author => author.id !== id));
+    setAuthors(authors.filter((author) => author.id !== id))
     toast({
       title: "Author Deleted",
       description: "The author has been removed from the system.",
-    });
-  };
+    })
+  }
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, type: 'book' | 'author') => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, type: "book" | "author") => {
+    const file = event.target.files?.[0]
+    if (!file) return
 
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random()}.${fileExt}`;
-    const filePath = `${fileName}`;
+    const fileExt = file.name.split(".").pop()
+    const fileName = `${Math.random()}.${fileExt}`
+    const filePath = `${fileName}`
 
-    setUploadingImage(true);
+    setUploadingImage(true)
 
     try {
       const { error: uploadError } = await supabase.storage
-        .from(type === 'book' ? 'covers' : 'avatars')
-        .upload(filePath, file);
+        .from(type === "book" ? "covers" : "avatars")
+        .upload(filePath, file)
 
       if (uploadError) {
-        throw uploadError;
+        throw uploadError
       }
 
-      const { data } = supabase.storage
-        .from(type === 'book' ? 'covers' : 'avatars')
-        .getPublicUrl(filePath);
+      const { data } = supabase.storage.from(type === "book" ? "covers" : "avatars").getPublicUrl(filePath)
 
-      if (type === 'book') {
-        setNewBook({...newBook, coverImage: data.publicUrl});
+      if (type === "book") {
+        setNewBook({ ...newBook, coverImage: data.publicUrl })
       } else {
-        setNewAuthor({...newAuthor, profileImage: data.publicUrl});
+        setNewAuthor({ ...newAuthor, profileImage: data.publicUrl })
       }
 
       toast({
         title: "Image Uploaded Successfully",
-        description: `${type === 'book' ? 'Cover' : 'Profile'} image has been uploaded.`,
-      });
+        description: `${type === "book" ? "Cover" : "Profile"} image has been uploaded.`,
+      })
     } catch (error) {
       toast({
         title: "Upload Failed",
         description: "Failed to upload image. Please try again.",
         variant: "destructive",
-      });
+      })
     } finally {
-      setUploadingImage(false);
+      setUploadingImage(false)
     }
-  };
+  }
 
   const handlePlagiarismCheck = async (manuscriptId: string, content: string) => {
-    setCheckingPlagiarism(true);
+    setCheckingPlagiarism(true)
     try {
-      const { data, error } = await supabase.functions.invoke('plagiarism-check', {
-        body: { manuscriptText: content, manuscriptId }
-      });
+      const { data, error } = await supabase.functions.invoke("plagiarism-check", {
+        body: { manuscriptText: content, manuscriptId },
+      })
 
-      if (error) throw error;
+      if (error) throw error
 
       toast({
         title: "Plagiarism Check Completed",
         description: `Plagiarism score: ${data.plagiarismScore?.toFixed(1)}%`,
-      });
+      })
 
       // Refresh manuscripts to show updated plagiarism score
-      fetchManuscripts();
+      fetchManuscripts()
     } catch (error) {
       toast({
         title: "Plagiarism Check Failed",
         description: "Failed to check plagiarism. Please try again.",
         variant: "destructive",
-      });
+      })
     } finally {
-      setCheckingPlagiarism(false);
+      setCheckingPlagiarism(false)
     }
-  };
+  }
+
+  const fetchUpcomingBooks = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("upcoming_books")
+        .select("*")
+        .order("created_at", { ascending: false })
+
+      if (error) throw error
+      setUpcomingBooks(data || [])
+    } catch (error) {
+      console.error("Error fetching upcoming books:", error)
+    }
+  }
+
+  const fetchManuscripts = async () => {
+    try {
+      // For now using mock data since the Supabase client might not have proper types
+      setManuscripts([])
+    } catch (error) {
+      console.error("Error fetching manuscripts:", error)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-brand-primary"></div>
+      </div>
+    )
+  }
+
+  if (!user || !isAdmin) {
+    return <Navigate to="/auth" replace />
+  }
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       {/* Admin Header */}
       <section className="py-12 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
@@ -342,11 +336,21 @@ const Admin = () => {
       <div className="container mx-auto px-4 py-8">
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-8">
           <TabsList className="grid w-full grid-cols-5 bg-white/10 backdrop-blur-sm rounded-xl p-1">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-white data-[state=active]:text-gray-900">Overview</TabsTrigger>
-            <TabsTrigger value="manuscripts" className="data-[state=active]:bg-white data-[state=active]:text-gray-900">Manuscripts</TabsTrigger>
-            <TabsTrigger value="books" className="data-[state=active]:bg-white data-[state=active]:text-gray-900">Books</TabsTrigger>
-            <TabsTrigger value="authors" className="data-[state=active]:bg-white data-[state=active]:text-gray-900">Authors</TabsTrigger>
-            <TabsTrigger value="analytics" className="data-[state=active]:bg-white data-[state=active]:text-gray-900">Analytics</TabsTrigger>
+            <TabsTrigger value="overview" className="data-[state=active]:bg-white data-[state=active]:text-gray-900">
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="manuscripts" className="data-[state=active]:bg-white data-[state=active]:text-gray-900">
+              Manuscripts
+            </TabsTrigger>
+            <TabsTrigger value="books" className="data-[state=active]:bg-white data-[state=active]:text-gray-900">
+              Books
+            </TabsTrigger>
+            <TabsTrigger value="authors" className="data-[state=active]:bg-white data-[state=active]:text-gray-900">
+              Authors
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-white data-[state=active]:text-gray-900">
+              Analytics
+            </TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -356,7 +360,7 @@ const Admin = () => {
               <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-blue-800">Total Books</CardTitle>
-                  <BookOpen className="h-5 w-5 text-blue-600" />
+                  <ImageIcon className="h-5 w-5 text-blue-600" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-blue-900">{stats.totalBooks}</div>
@@ -367,7 +371,7 @@ const Admin = () => {
               <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-green-800">Authors</CardTitle>
-                  <Users className="h-5 w-5 text-green-600" />
+                  <ImageIcon className="h-5 w-5 text-green-600" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-green-900">10+</div>
@@ -378,7 +382,7 @@ const Admin = () => {
               <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-purple-800">Manuscripts</CardTitle>
-                  <Package className="h-5 w-5 text-purple-600" />
+                  <ImageIcon className="h-5 w-5 text-purple-600" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-purple-900">5</div>
@@ -389,7 +393,7 @@ const Admin = () => {
               <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-orange-800">Revenue</CardTitle>
-                  <TrendingUp className="h-5 w-5 text-orange-600" />
+                  <ImageIcon className="h-5 w-5 text-orange-600" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-orange-900">₹{stats.totalRevenue.toLocaleString()}</div>
@@ -411,11 +415,9 @@ const Admin = () => {
                       <div key={book.id} className="flex items-center justify-between p-3 border rounded-lg">
                         <div>
                           <h4 className="font-medium text-sm">{book.title}</h4>
-                          <p className="text-xs text-muted-foreground">by {book.authors.join(', ')}</p>
+                          <p className="text-xs text-muted-foreground">by {book.authors.join(", ")}</p>
                         </div>
-                        <Badge variant={book.status === 'Published' ? 'default' : 'secondary'}>
-                          {book.status}
-                        </Badge>
+                        <Badge variant={book.status === "Published" ? "default" : "secondary"}>{book.status}</Badge>
                       </div>
                     ))}
                   </div>
@@ -429,17 +431,20 @@ const Admin = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {books.sort((a, b) => b.sales - a.sales).slice(0, 3).map((book) => (
-                      <div key={book.id} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div>
-                          <h4 className="font-medium text-sm">{book.title}</h4>
-                          <p className="text-xs text-muted-foreground">{book.sales} copies sold</p>
+                    {books
+                      .sort((a, b) => b.sales - a.sales)
+                      .slice(0, 3)
+                      .map((book) => (
+                        <div key={book.id} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div>
+                            <h4 className="font-medium text-sm">{book.title}</h4>
+                            <p className="text-xs text-muted-foreground">{book.sales} copies sold</p>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm font-medium">{book.revenue}</div>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <div className="text-sm font-medium">{book.revenue}</div>
-                        </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 </CardContent>
               </Card>
@@ -460,29 +465,29 @@ const Admin = () => {
               <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-yellow-800">Pending Review</CardTitle>
-                  <Eye className="h-5 w-5 text-yellow-600" />
+                  <ImageIcon className="h-5 w-5 text-yellow-600" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-yellow-900">3</div>
                   <p className="text-xs text-yellow-600 mt-1">Awaiting review</p>
                 </CardContent>
               </Card>
-              
+
               <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-blue-800">In Review</CardTitle>
-                  <Settings className="h-5 w-5 text-blue-600" />
+                  <ImageIcon className="h-5 w-5 text-blue-600" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-blue-900">2</div>
                   <p className="text-xs text-blue-600 mt-1">Under review</p>
                 </CardContent>
               </Card>
-              
+
               <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-green-800">Approved</CardTitle>
-                  <TrendingUp className="h-5 w-5 text-green-600" />
+                  <ImageIcon className="h-5 w-5 text-green-600" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-green-900">5</div>
@@ -525,10 +530,12 @@ const Admin = () => {
                             <Badge variant="outline" className="bg-green-50 text-green-700">
                               2.3%
                             </Badge>
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              onClick={() => handlePlagiarismCheck('ms001', 'sample manuscript content for plagiarism check')}
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() =>
+                                handlePlagiarismCheck("ms001", "sample manuscript content for plagiarism check")
+                              }
                               disabled={checkingPlagiarism}
                             >
                               {checkingPlagiarism ? "Checking..." : "Recheck"}
@@ -538,10 +545,10 @@ const Admin = () => {
                         <td className="p-4">
                           <div className="flex space-x-2">
                             <Button size="sm" variant="outline">
-                              <Eye className="w-4 h-4" />
+                              <ImageIcon className="w-4 h-4" />
                             </Button>
                             <Button size="sm" variant="outline">
-                              <Edit className="w-4 h-4" />
+                              <ImageIcon className="w-4 h-4" />
                             </Button>
                             <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
                               Approve
@@ -557,17 +564,19 @@ const Admin = () => {
                         <td className="p-4 text-sm">Prof. John Davis</td>
                         <td className="p-4 text-sm">2024-01-18</td>
                         <td className="p-4">
-                          <Badge variant="default" className="bg-blue-600">In Review</Badge>
+                          <Badge variant="default" className="bg-blue-600">
+                            In Review
+                          </Badge>
                         </td>
                         <td className="p-4">
                           <div className="flex items-center space-x-2">
                             <Badge variant="outline" className="bg-yellow-50 text-yellow-700">
                               5.7%
                             </Badge>
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              onClick={() => handlePlagiarismCheck('ms002', 'sample blockchain manuscript content')}
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handlePlagiarismCheck("ms002", "sample blockchain manuscript content")}
                               disabled={checkingPlagiarism}
                             >
                               {checkingPlagiarism ? "Checking..." : "Recheck"}
@@ -577,10 +586,10 @@ const Admin = () => {
                         <td className="p-4">
                           <div className="flex space-x-2">
                             <Button size="sm" variant="outline">
-                              <Eye className="w-4 h-4" />
+                              <ImageIcon className="w-4 h-4" />
                             </Button>
                             <Button size="sm" variant="outline">
-                              <Edit className="w-4 h-4" />
+                              <ImageIcon className="w-4 h-4" />
                             </Button>
                             <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
                               Approve
@@ -609,9 +618,7 @@ const Admin = () => {
                 <DialogContent className="max-w-2xl">
                   <DialogHeader>
                     <DialogTitle>Add New Book</DialogTitle>
-                    <DialogDescription>
-                      Enter the details for the new book publication.
-                    </DialogDescription>
+                    <DialogDescription>Enter the details for the new book publication.</DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="space-y-2">
@@ -619,7 +626,7 @@ const Admin = () => {
                       <Input
                         id="title"
                         value={newBook.title}
-                        onChange={(e) => setNewBook({...newBook, title: e.target.value})}
+                        onChange={(e) => setNewBook({ ...newBook, title: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
@@ -627,13 +634,16 @@ const Admin = () => {
                       <Input
                         id="authors"
                         value={newBook.authors}
-                        onChange={(e) => setNewBook({...newBook, authors: e.target.value})}
+                        onChange={(e) => setNewBook({ ...newBook, authors: e.target.value })}
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="category">Category</Label>
-                        <Select value={newBook.category} onValueChange={(value) => setNewBook({...newBook, category: value})}>
+                        <Select
+                          value={newBook.category}
+                          onValueChange={(value) => setNewBook({ ...newBook, category: value })}
+                        >
                           <SelectTrigger>
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
@@ -650,7 +660,7 @@ const Admin = () => {
                         <Input
                           id="price"
                           value={newBook.price}
-                          onChange={(e) => setNewBook({...newBook, price: e.target.value})}
+                          onChange={(e) => setNewBook({ ...newBook, price: e.target.value })}
                         />
                       </div>
                     </div>
@@ -659,7 +669,7 @@ const Admin = () => {
                       <Input
                         id="isbn"
                         value={newBook.isbn}
-                        onChange={(e) => setNewBook({...newBook, isbn: e.target.value})}
+                        onChange={(e) => setNewBook({ ...newBook, isbn: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
@@ -667,7 +677,7 @@ const Admin = () => {
                       <Textarea
                         id="description"
                         value={newBook.description}
-                        onChange={(e) => setNewBook({...newBook, description: e.target.value})}
+                        onChange={(e) => setNewBook({ ...newBook, description: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
@@ -677,16 +687,16 @@ const Admin = () => {
                           id="coverImage"
                           type="file"
                           accept="image/*"
-                          onChange={(e) => handleImageUpload(e, 'book')}
+                          onChange={(e) => handleImageUpload(e, "book")}
                           disabled={uploadingImage}
                         />
                         {uploadingImage && <span className="text-sm text-muted-foreground">Uploading...</span>}
                       </div>
                       {newBook.coverImage && (
                         <div className="mt-2">
-                          <img 
-                            src={newBook.coverImage} 
-                            alt="Cover preview" 
+                          <img
+                            src={newBook.coverImage || "/placeholder.svg"}
+                            alt="Cover preview"
                             className="w-20 h-28 object-cover rounded border"
                           />
                         </div>
@@ -726,24 +736,22 @@ const Admin = () => {
                             <div className="font-medium">{book.title}</div>
                             <div className="text-sm text-muted-foreground">ID: {book.id}</div>
                           </td>
-                          <td className="p-4 text-sm">{book.authors.join(', ')}</td>
+                          <td className="p-4 text-sm">{book.authors.join(", ")}</td>
                           <td className="p-4">
                             <Badge variant="secondary">{book.category}</Badge>
                           </td>
                           <td className="p-4">
-                            <Badge variant={book.status === 'Published' ? 'default' : 'secondary'}>
-                              {book.status}
-                            </Badge>
+                            <Badge variant={book.status === "Published" ? "default" : "secondary"}>{book.status}</Badge>
                           </td>
                           <td className="p-4">{book.sales}</td>
                           <td className="p-4 font-medium">{book.revenue}</td>
                           <td className="p-4">
                             <div className="flex space-x-2">
                               <Button size="sm" variant="outline">
-                                <Eye className="w-4 h-4" />
+                                <ImageIcon className="w-4 h-4" />
                               </Button>
                               <Button size="sm" variant="outline">
-                                <Edit className="w-4 h-4" />
+                                <ImageIcon className="w-4 h-4" />
                               </Button>
                               <Button size="sm" variant="outline" onClick={() => handleDeleteBook(book.id)}>
                                 <Trash2 className="w-4 h-4" />
@@ -773,9 +781,7 @@ const Admin = () => {
                 <DialogContent className="max-w-2xl">
                   <DialogHeader>
                     <DialogTitle>Add New Author</DialogTitle>
-                    <DialogDescription>
-                      Enter the details for the new author.
-                    </DialogDescription>
+                    <DialogDescription>Enter the details for the new author.</DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-2 gap-4">
@@ -784,7 +790,7 @@ const Admin = () => {
                         <Input
                           id="authorName"
                           value={newAuthor.name}
-                          onChange={(e) => setNewAuthor({...newAuthor, name: e.target.value})}
+                          onChange={(e) => setNewAuthor({ ...newAuthor, name: e.target.value })}
                         />
                       </div>
                       <div className="space-y-2">
@@ -793,7 +799,7 @@ const Admin = () => {
                           id="authorEmail"
                           type="email"
                           value={newAuthor.email}
-                          onChange={(e) => setNewAuthor({...newAuthor, email: e.target.value})}
+                          onChange={(e) => setNewAuthor({ ...newAuthor, email: e.target.value })}
                         />
                       </div>
                     </div>
@@ -802,7 +808,7 @@ const Admin = () => {
                       <Input
                         id="affiliation"
                         value={newAuthor.affiliation}
-                        onChange={(e) => setNewAuthor({...newAuthor, affiliation: e.target.value})}
+                        onChange={(e) => setNewAuthor({ ...newAuthor, affiliation: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
@@ -810,7 +816,7 @@ const Admin = () => {
                       <Input
                         id="specialization"
                         value={newAuthor.specialization}
-                        onChange={(e) => setNewAuthor({...newAuthor, specialization: e.target.value})}
+                        onChange={(e) => setNewAuthor({ ...newAuthor, specialization: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
@@ -818,7 +824,7 @@ const Admin = () => {
                       <Textarea
                         id="bio"
                         value={newAuthor.bio}
-                        onChange={(e) => setNewAuthor({...newAuthor, bio: e.target.value})}
+                        onChange={(e) => setNewAuthor({ ...newAuthor, bio: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
@@ -828,16 +834,16 @@ const Admin = () => {
                           id="profileImage"
                           type="file"
                           accept="image/*"
-                          onChange={(e) => handleImageUpload(e, 'author')}
+                          onChange={(e) => handleImageUpload(e, "author")}
                           disabled={uploadingImage}
                         />
                         {uploadingImage && <span className="text-sm text-muted-foreground">Uploading...</span>}
                       </div>
                       {newAuthor.profileImage && (
                         <div className="mt-2">
-                          <img 
-                            src={newAuthor.profileImage} 
-                            alt="Profile preview" 
+                          <img
+                            src={newAuthor.profileImage || "/placeholder.svg"}
+                            alt="Profile preview"
                             className="w-20 h-20 object-cover rounded-full border"
                           />
                         </div>
@@ -880,17 +886,17 @@ const Admin = () => {
                           <td className="p-4">{author.booksPublished}</td>
                           <td className="p-4">{author.totalSales}</td>
                           <td className="p-4">
-                            <Badge variant={author.status === 'Active' ? 'default' : 'secondary'}>
+                            <Badge variant={author.status === "Active" ? "default" : "secondary"}>
                               {author.status}
                             </Badge>
                           </td>
                           <td className="p-4">
                             <div className="flex space-x-2">
                               <Button size="sm" variant="outline">
-                                <Eye className="w-4 h-4" />
+                                <ImageIcon className="w-4 h-4" />
                               </Button>
                               <Button size="sm" variant="outline">
-                                <Edit className="w-4 h-4" />
+                                <ImageIcon className="w-4 h-4" />
                               </Button>
                               <Button size="sm" variant="outline" onClick={() => handleDeleteAuthor(author.id)}>
                                 <Trash2 className="w-4 h-4" />
@@ -909,7 +915,7 @@ const Admin = () => {
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-6">
             <h2 className="text-2xl font-bold">Analytics & Reports</h2>
-            
+
             <div className="grid md:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
@@ -947,15 +953,15 @@ const Admin = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-3 gap-4">
-                  <Button variant="outline" className="h-20 flex-col">
+                  <Button variant="outline" className="h-20 flex-col bg-transparent">
                     <Upload className="w-6 h-6 mb-2" />
                     Sales Report
                   </Button>
-                  <Button variant="outline" className="h-20 flex-col">
+                  <Button variant="outline" className="h-20 flex-col bg-transparent">
                     <Upload className="w-6 h-6 mb-2" />
                     Author Report
                   </Button>
-                  <Button variant="outline" className="h-20 flex-col">
+                  <Button variant="outline" className="h-20 flex-col bg-transparent">
                     <Upload className="w-6 h-6 mb-2" />
                     Revenue Report
                   </Button>
@@ -966,7 +972,7 @@ const Admin = () => {
         </Tabs>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Admin;
+export default Admin
