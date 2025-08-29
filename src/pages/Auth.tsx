@@ -1,172 +1,174 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { BookOpen, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+"use client"
+
+import type React from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/router"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { BookOpen, Mail, Lock, User, Eye, EyeOff } from "lucide-react"
+import { useAuth } from "@/contexts/AuthContext"
+import { useToast } from "@/hooks/use-toast"
 
 export default function Auth() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { signIn, signUp, user } = useAuth();
-  const { toast } = useToast();
-  
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter()
+  const { signIn, signUp, user } = useAuth()
+  const { toast } = useToast()
+
+  const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    fullName: '',
-    confirmPassword: ''
-  });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+    email: "",
+    password: "",
+    fullName: "",
+    confirmPassword: "",
+  })
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   // Redirect if already authenticated
   useEffect(() => {
     if (user) {
-      const from = location.state?.from?.pathname || '/';
-      navigate(from, { replace: true });
+      const nextFromQuery = typeof router.query.next === "string" ? router.query.next : "/"
+      router.replace(nextFromQuery || "/")
     }
-  }, [user, navigate, location]);
+  }, [user, router])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: "" }))
     }
-  };
+  }
 
   const validateSignUp = () => {
-    const newErrors: Record<string, string> = {};
-    
+    const newErrors: Record<string, string> = {}
+
     if (!formData.fullName.trim()) {
-      newErrors.fullName = 'Full name is required';
+      newErrors.fullName = "Full name is required"
     }
-    
+
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required"
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email';
+      newErrors.email = "Please enter a valid email"
     }
-    
+
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = "Password is required"
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = "Password must be at least 6 characters"
     }
-    
+
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = "Passwords do not match"
     }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
   const validateSignIn = () => {
-    const newErrors: Record<string, string> = {};
-    
+    const newErrors: Record<string, string> = {}
+
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required"
     }
-    
+
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = "Password is required"
     }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
   const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateSignIn()) return;
-    
-    setIsLoading(true);
-    
+    e.preventDefault()
+
+    if (!validateSignIn()) return
+
+    setIsLoading(true)
+
     try {
-      const { error } = await signIn(formData.email, formData.password);
-      
+      const { error } = await signIn(formData.email, formData.password)
+
       if (error) {
-        if (error.message.includes('Invalid login credentials')) {
+        if (error.message.includes("Invalid login credentials")) {
           toast({
             title: "Login Failed",
             description: "Invalid email or password. Please try again.",
-            variant: "destructive"
-          });
+            variant: "destructive",
+          })
         } else {
           toast({
             title: "Login Failed",
             description: error.message,
-            variant: "destructive"
-          });
+            variant: "destructive",
+          })
         }
       } else {
         toast({
           title: "Welcome back!",
-          description: "You have been successfully logged in."
-        });
+          description: "You have been successfully logged in.",
+        })
       }
     } catch (error) {
       toast({
         title: "Error",
         description: "An unexpected error occurred. Please try again.",
-        variant: "destructive"
-      });
+        variant: "destructive",
+      })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateSignUp()) return;
-    
-    setIsLoading(true);
-    
+    e.preventDefault()
+
+    if (!validateSignUp()) return
+
+    setIsLoading(true)
+
     try {
-      const { error } = await signUp(formData.email, formData.password, formData.fullName);
-      
+      const { error } = await signUp(formData.email, formData.password, formData.fullName)
+
       if (error) {
-        if (error.message.includes('User already registered')) {
+        if (error.message.includes("User already registered")) {
           toast({
             title: "Account Exists",
             description: "An account with this email already exists. Please try logging in.",
-            variant: "destructive"
-          });
+            variant: "destructive",
+          })
         } else {
           toast({
             title: "Registration Failed",
             description: error.message,
-            variant: "destructive"
-          });
+            variant: "destructive",
+          })
         }
       } else {
         toast({
           title: "Account Created!",
-          description: "Your account has been created and you are now logged in."
-        });
+          description: "Your account has been created and you are now logged in.",
+        })
         // No need to clear form as user will be redirected automatically
       }
     } catch (error) {
       toast({
         title: "Error",
         description: "An unexpected error occurred. Please try again.",
-        variant: "destructive"
-      });
+        variant: "destructive",
+      })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-4">
@@ -182,9 +184,7 @@ export default function Auth() {
         <Card>
           <CardHeader>
             <CardTitle>Access Your Account</CardTitle>
-            <CardDescription>
-              Sign in to your existing account or create a new one
-            </CardDescription>
+            <CardDescription>Sign in to your existing account or create a new one</CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="signin" className="space-y-4">
@@ -210,9 +210,7 @@ export default function Auth() {
                         disabled={isLoading}
                       />
                     </div>
-                    {errors.email && (
-                      <p className="text-sm text-destructive">{errors.email}</p>
-                    )}
+                    {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -236,20 +234,14 @@ export default function Auth() {
                         className="absolute right-0 top-0 h-full px-3 py-2"
                         onClick={() => setShowPassword(!showPassword)}
                       >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
                     </div>
-                    {errors.password && (
-                      <p className="text-sm text-destructive">{errors.password}</p>
-                    )}
+                    {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
                   </div>
 
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? 'Signing in...' : 'Sign In'}
+                    {isLoading ? "Signing in..." : "Sign In"}
                   </Button>
                 </form>
               </TabsContent>
@@ -271,9 +263,7 @@ export default function Auth() {
                         disabled={isLoading}
                       />
                     </div>
-                    {errors.fullName && (
-                      <p className="text-sm text-destructive">{errors.fullName}</p>
-                    )}
+                    {errors.fullName && <p className="text-sm text-destructive">{errors.fullName}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -291,9 +281,7 @@ export default function Auth() {
                         disabled={isLoading}
                       />
                     </div>
-                    {errors.email && (
-                      <p className="text-sm text-destructive">{errors.email}</p>
-                    )}
+                    {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -317,16 +305,10 @@ export default function Auth() {
                         className="absolute right-0 top-0 h-full px-3 py-2"
                         onClick={() => setShowPassword(!showPassword)}
                       >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
                     </div>
-                    {errors.password && (
-                      <p className="text-sm text-destructive">{errors.password}</p>
-                    )}
+                    {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -344,13 +326,11 @@ export default function Auth() {
                         disabled={isLoading}
                       />
                     </div>
-                    {errors.confirmPassword && (
-                      <p className="text-sm text-destructive">{errors.confirmPassword}</p>
-                    )}
+                    {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword}</p>}
                   </div>
 
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? 'Creating account...' : 'Create Account'}
+                    {isLoading ? "Creating account..." : "Create Account"}
                   </Button>
                 </form>
 
@@ -363,11 +343,7 @@ export default function Auth() {
             </Tabs>
 
             <div className="mt-6 text-center">
-              <Button
-                variant="link"
-                onClick={() => navigate('/')}
-                className="text-sm text-muted-foreground"
-              >
+              <Button variant="link" onClick={() => router.push("/")} className="text-sm text-muted-foreground">
                 ← Back to Home
               </Button>
             </div>
@@ -375,5 +351,5 @@ export default function Auth() {
         </Card>
       </div>
     </div>
-  );
+  )
 }

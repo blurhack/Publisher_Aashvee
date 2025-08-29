@@ -1,191 +1,186 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Progress } from '@/components/ui/progress';
-import { FileText, Upload, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+"use client"
+
+import React, { useState } from "react"
+import { useRouter } from "next/router"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Progress } from "@/components/ui/progress"
+import { FileText, Upload, AlertCircle, Loader2 } from "lucide-react"
+import { useAuth } from "@/contexts/AuthContext"
+import { useToast } from "@/hooks/use-toast"
+import { supabase } from "@/integrations/supabase/client"
 
 export default function SubmitManuscript() {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const { toast } = useToast();
-  
-  const [isLoading, setIsLoading] = useState(false);
-  const [plagiarismChecking, setPlagiarismChecking] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const router = useRouter()
+  const { user } = useAuth()
+  const { toast } = useToast()
+
+  const [isLoading, setIsLoading] = useState(false)
+  const [plagiarismChecking, setPlagiarismChecking] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
   const [formData, setFormData] = useState({
-    title: '',
-    genre: '',
-    wordCount: '',
-    synopsis: '',
+    title: "",
+    genre: "",
+    wordCount: "",
+    synopsis: "",
     manuscriptFile: null as File | null,
-    samplePages: null as File | null
-  });
+    samplePages: null as File | null,
+  })
 
   // Redirect if not authenticated
   React.useEffect(() => {
     if (!user) {
-      navigate('/auth', { state: { from: location } });
+      router.push(`/auth?next=${encodeURIComponent(router.asPath)}`)
     }
-  }, [user, navigate]);
+  }, [user, router])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
-    const file = e.target.files?.[0] || null;
-    setFormData(prev => ({ ...prev, [fieldName]: file }));
-  };
+    const file = e.target.files?.[0] || null
+    setFormData((prev) => ({ ...prev, [fieldName]: file }))
+  }
 
   const uploadFile = async (file: File, bucket: string, path: string) => {
-    const { data, error } = await supabase.storage
-      .from(bucket)
-      .upload(path, file);
+    const { data, error } = await supabase.storage.from(bucket).upload(path, file)
 
-    if (error) throw error;
-    return data;
-  };
+    if (error) throw error
+    return data
+  }
 
   const checkPlagiarism = async (manuscriptText: string, manuscriptId: string) => {
     try {
-      setPlagiarismChecking(true);
-      
-      const { data, error } = await supabase.functions.invoke('plagiarism-check', {
+      setPlagiarismChecking(true)
+
+      const { data, error } = await supabase.functions.invoke("plagiarism-check", {
         body: {
           manuscriptText,
-          manuscriptId
-        }
-      });
+          manuscriptId,
+        },
+      })
 
-      if (error) throw error;
-      
-      return data;
+      if (error) throw error
+
+      return data
     } catch (error) {
-      console.error('Plagiarism check failed:', error);
+      console.error("Plagiarism check failed:", error)
       toast({
         title: "Plagiarism Check Warning",
         description: "Could not complete plagiarism check, but manuscript was submitted successfully.",
-        variant: "destructive"
-      });
-      return null;
+        variant: "destructive",
+      })
+      return null
     } finally {
-      setPlagiarismChecking(false);
+      setPlagiarismChecking(false)
     }
-  };
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!user) return;
-    
+    e.preventDefault()
+
+    if (!user) return
+
     // Validation
     if (!formData.title || !formData.genre || !formData.wordCount || !formData.synopsis) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
-        variant: "destructive"
-      });
-      return;
+        variant: "destructive",
+      })
+      return
     }
 
     if (!formData.manuscriptFile) {
       toast({
         title: "No Manuscript File",
         description: "Please upload your manuscript file.",
-        variant: "destructive"
-      });
-      return;
+        variant: "destructive",
+      })
+      return
     }
 
-    setIsLoading(true);
-    setUploadProgress(0);
+    setIsLoading(true)
+    setUploadProgress(0)
 
     try {
       // Step 1: Upload manuscript file
-      setUploadProgress(25);
-      const manuscriptPath = `${user.id}/${Date.now()}_${formData.manuscriptFile.name}`;
-      await uploadFile(formData.manuscriptFile, 'manuscripts', manuscriptPath);
-      const manuscriptUrl = `${supabase.storage.from('manuscripts').getPublicUrl(manuscriptPath).data.publicUrl}`;
+      setUploadProgress(25)
+      const manuscriptPath = `${user.id}/${Date.now()}_${formData.manuscriptFile.name}`
+      await uploadFile(formData.manuscriptFile, "manuscripts", manuscriptPath)
+      const manuscriptUrl = `${supabase.storage.from("manuscripts").getPublicUrl(manuscriptPath).data.publicUrl}`
 
       // Step 2: Upload sample pages if provided
-      setUploadProgress(50);
-      let samplePagesUrl = null;
+      setUploadProgress(50)
+      let samplePagesUrl = null
       if (formData.samplePages) {
-        const samplePath = `${user.id}/${Date.now()}_sample_${formData.samplePages.name}`;
-        await uploadFile(formData.samplePages, 'manuscripts', samplePath);
-        samplePagesUrl = `${supabase.storage.from('manuscripts').getPublicUrl(samplePath).data.publicUrl}`;
+        const samplePath = `${user.id}/${Date.now()}_sample_${formData.samplePages.name}`
+        await uploadFile(formData.samplePages, "manuscripts", samplePath)
+        samplePagesUrl = `${supabase.storage.from("manuscripts").getPublicUrl(samplePath).data.publicUrl}`
       }
 
       // Step 3: Create manuscript record (simplified for demo)
-      setUploadProgress(75);
-      
+      setUploadProgress(75)
+
       // For demonstration, we'll just show success
       // In real implementation, database insert would happen here
-      
-      // Step 4: Run plagiarism check in background
-      setUploadProgress(90);
-      // For demo purposes, we'll use the synopsis as manuscript text
-      await checkPlagiarism(formData.synopsis, 'demo-manuscript-id');
 
-      setUploadProgress(100);
+      // Step 4: Run plagiarism check in background
+      setUploadProgress(90)
+      // For demo purposes, we'll use the synopsis as manuscript text
+      await checkPlagiarism(formData.synopsis, "demo-manuscript-id")
+
+      setUploadProgress(100)
 
       toast({
         title: "Manuscript Submitted!",
-        description: "Your manuscript has been successfully submitted for review."
-      });
+        description: "Your manuscript has been successfully submitted for review.",
+      })
 
       // Clear form
       setFormData({
-        title: '',
-        genre: '',
-        wordCount: '',
-        synopsis: '',
+        title: "",
+        genre: "",
+        wordCount: "",
+        synopsis: "",
         manuscriptFile: null,
-        samplePages: null
-      });
+        samplePages: null,
+      })
 
       // Reset file inputs
-      const fileInputs = document.querySelectorAll('input[type="file"]') as NodeListOf<HTMLInputElement>;
-      fileInputs.forEach(input => {
-        input.value = '';
-      });
-
+      const fileInputs = document.querySelectorAll('input[type="file"]') as NodeListOf<HTMLInputElement>
+      fileInputs.forEach((input) => {
+        input.value = ""
+      })
     } catch (error: any) {
-      console.error('Submission error:', error);
+      console.error("Submission error:", error)
       toast({
         title: "Submission Failed",
         description: error.message || "An error occurred while submitting your manuscript.",
-        variant: "destructive"
-      });
+        variant: "destructive",
+      })
     } finally {
-      setIsLoading(false);
-      setUploadProgress(0);
+      setIsLoading(false)
+      setUploadProgress(0)
     }
-  };
+  }
 
-  if (!user) return null;
+  if (!user) return null
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="mb-8">
-        <Button
-          variant="outline"
-          onClick={() => navigate('/')}
-          className="mb-4"
-        >
+        <Button variant="outline" onClick={() => router.push("/")} className="mb-4">
           ← Back to Home
         </Button>
-        
+
         <div className="text-center">
           <h1 className="text-3xl font-bold mb-2">Submit Your Manuscript</h1>
           <p className="text-muted-foreground">
@@ -200,9 +195,7 @@ export default function SubmitManuscript() {
             <FileText className="h-5 w-5" />
             Manuscript Submission Form
           </CardTitle>
-          <CardDescription>
-            Please provide detailed information about your manuscript
-          </CardDescription>
+          <CardDescription>Please provide detailed information about your manuscript</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -224,7 +217,7 @@ export default function SubmitManuscript() {
                 <Label htmlFor="genre">Genre *</Label>
                 <Select
                   value={formData.genre}
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, genre: value }))}
+                  onValueChange={(value) => setFormData((prev) => ({ ...prev, genre: value }))}
                   disabled={isLoading}
                 >
                   <SelectTrigger>
@@ -281,14 +274,12 @@ export default function SubmitManuscript() {
                     id="manuscriptFile"
                     type="file"
                     accept=".pdf,.doc,.docx"
-                    onChange={(e) => handleFileChange(e, 'manuscriptFile')}
+                    onChange={(e) => handleFileChange(e, "manuscriptFile")}
                     disabled={isLoading}
                     required
                   />
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Accepted formats: PDF, DOC, DOCX
-                </p>
+                <p className="text-sm text-muted-foreground">Accepted formats: PDF, DOC, DOCX</p>
               </div>
 
               <div className="space-y-2">
@@ -298,13 +289,11 @@ export default function SubmitManuscript() {
                     id="samplePages"
                     type="file"
                     accept=".pdf,.doc,.docx"
-                    onChange={(e) => handleFileChange(e, 'samplePages')}
+                    onChange={(e) => handleFileChange(e, "samplePages")}
                     disabled={isLoading}
                   />
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  First 10-20 pages for quick review
-                </p>
+                <p className="text-sm text-muted-foreground">First 10-20 pages for quick review</p>
               </div>
             </div>
 
@@ -321,27 +310,20 @@ export default function SubmitManuscript() {
             {plagiarismChecking && (
               <Alert>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <AlertDescription>
-                  Running plagiarism check on your manuscript...
-                </AlertDescription>
+                <AlertDescription>Running plagiarism check on your manuscript...</AlertDescription>
               </Alert>
             )}
 
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                <strong>Please note:</strong> All submissions undergo plagiarism checking and editorial review. 
-                You will be notified within 2-4 weeks about the status of your submission.
+                <strong>Please note:</strong> All submissions undergo plagiarism checking and editorial review. You will
+                be notified within 2-4 weeks about the status of your submission.
               </AlertDescription>
             </Alert>
 
             <div className="flex justify-center">
-              <Button
-                type="submit"
-                size="lg"
-                disabled={isLoading || plagiarismChecking}
-                className="w-full md:w-auto"
-              >
+              <Button type="submit" size="lg" disabled={isLoading || plagiarismChecking} className="w-full md:w-auto">
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -359,5 +341,5 @@ export default function SubmitManuscript() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
